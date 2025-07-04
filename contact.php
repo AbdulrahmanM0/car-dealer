@@ -1,19 +1,40 @@
-<?php // car-details.php - Car Details page (dynamic) ?>
-<?php include 'db.php'; ?>
 <?php
-$car = null;
-if (isset($_GET['id'])) {
-    $id = intval($_GET['id']);
-    $result = $conn->query("SELECT * FROM cars WHERE id = $id");
-    if ($result && $result->num_rows > 0) {
-        $car = $result->fetch_assoc();
+include 'db.php';
+$contact_success = false;
+$contact_error = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'], $_POST['email'], $_POST['message'])) {
+    $name = trim($_POST['name']);
+    $email = trim($_POST['email']);
+    $message = trim($_POST['message']);
+    if ($name && $email && $message) {
+        $conn->query("CREATE TABLE IF NOT EXISTS contacts (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            email VARCHAR(255) NOT NULL,
+            message TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )");
+        $stmt = $conn->prepare("INSERT INTO contacts (name, email, message) VALUES (?, ?, ?)");
+        if ($stmt) {
+            $stmt->bind_param('sss', $name, $email, $message);
+            if ($stmt->execute()) {
+                $contact_success = true;
+            } else {
+                $contact_error = 'Error saving your message. Please try again.';
+            }
+            $stmt->close();
+        } else {
+            $contact_error = 'Error preparing database statement.';
+        }
+    } else {
+        $contact_error = 'Please fill in all fields.';
     }
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-     <title>Car Details</title>
+     <title>SELL CAR</title>
      <meta charset="UTF-8">
      <meta http-equiv="X-UA-Compatible" content="IE=Edge">
      <meta name="description" content="">
@@ -49,77 +70,47 @@ if (isset($_GET['id'])) {
                          <li><a href="index.php">Home</a></li>
                          <li><a href="cars.php">Cars</a></li>
                          <li><a href="about-us.html">About Us</a></li>
-                         <li><a href="contact.php">Contact Us</a></li>
+                         <li class="active"><a href="contact.php">Contact Us</a></li>
                     </ul>
                </div>
           </div>
      </section>
      <section>
           <div class="container">
-               <?php if ($car) { ?>
+               <div class="text-center">
+                    <h1>Contact Us</h1>
+                    <br>
+                    <p class="lead">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illo, alias.</p>
+               </div>
+          </div>
+     </section>
+     <!-- CONTACT -->
+     <section id="contact">
+          <div class="container">
                <div class="row">
-                    <div class="col-md-6 col-xs-12">
-                         <div>
-                              <img src="<?php echo htmlspecialchars($car['image']); ?>" alt="" class="img-responsive wc-image">
-                         </div>
-                         <br>
-                    </div>
-                    <div class="col-md-6 col-xs-12">
-                         <form class="form">
-                              <h2><?php echo htmlspecialchars($car['name']); ?></h2>
-                              <p class="lead"><?php echo htmlspecialchars($car['description']); ?></p>
-                              <p class="lead"><strong class="text-primary">$<?php echo number_format($car['price'],2); ?></strong></p>
-                              <div class="row">
-                                   <div class="col-md-4 col-sm-6">
-                                        <p><span>Type</span><br><strong><?php echo htmlspecialchars($car['type'] ?? ''); ?></strong></p>
-                                   </div>
-                                   <div class="col-md-4 col-sm-6">
-                                        <p><span>Model</span><br><strong><?php echo htmlspecialchars($car['model'] ?? ''); ?></strong></p>
-                                   </div>
-                                   <div class="col-md-4 col-sm-6">
-                                        <p><span>Year</span><br><strong><?php echo htmlspecialchars($car['year']); ?></strong></p>
-                                   </div>
-                                   <div class="col-md-4 col-sm-6">
-                                        <p><span>Mileage</span><br><strong><?php echo htmlspecialchars($car['mileage'] ?? ''); ?></strong></p>
-                                   </div>
-                                   <div class="col-md-4 col-sm-6">
-                                        <p><span>Engine size</span><br><strong><?php echo htmlspecialchars($car['engine'] ?? ''); ?></strong></p>
-                                   </div>
-                                   <div class="col-md-4 col-sm-6">
-                                        <p><span>Transmission</span><br><strong><?php echo htmlspecialchars($car['transmission'] ?? ''); ?></strong></p>
-                                   </div>
+                    <div class="col-md-6 col-sm-12">
+                         <form id="contact-form" role="form" action="contact.php#contact" method="post">
+                              <?php if ($contact_success): ?>
+                                  <div class="alert alert-success">Thank you! Your message has been sent.</div>
+                              <?php elseif ($contact_error): ?>
+                                  <div class="alert alert-danger"><?php echo htmlspecialchars($contact_error); ?></div>
+                              <?php endif; ?>
+                              <div class="col-md-12 col-sm-12">
+                                   <input type="text" class="form-control" placeholder="Enter full name" name="name" required>
+                                   <input type="email" class="form-control" placeholder="Enter email address" name="email" required>
+                                   <textarea class="form-control" rows="6" placeholder="Tell us about your message" name="message" required></textarea>
+                              </div>
+                              <div class="col-md-4 col-sm-12">
+                                   <input type="submit" class="form-control" name="send message" value="Send Message">
                               </div>
                          </form>
                     </div>
-               </div>
-               <div class="row">
-                    <div class="col-lg-8 col-xs-12">
-                         <div class="panel panel-default">
-                              <div class="panel-heading">
-                                   <h4>Vehicle Description</h4>
-                              </div>
-                              <div class="panel-body">
-                                   <p><?php echo nl2br(htmlspecialchars($car['description'])); ?></p>
-                              </div>
-                         </div>
-                    </div>
-                    <div class="col-lg-4 col-xs-12">
-                         <div class="panel panel-default">
-                              <div class="panel-heading">
-                                   <h4>Contact Details</h4>
-                              </div>
-                              <div class="panel-body">
-                                   <p><span>Name</span><br><strong>John Smith</strong></p>
-                                   <p><span>Phone</span><br><strong><a href="tel:123-456-789">123-456-789</a></strong></p>
-                                   <p><span>Mobile phone</span><br><strong><a href="tel:456789123">456789123</a></strong></p>
-                                   <p><span>Email</span><br><strong><a href="mailto:john@carsales.com">john@carsales.com</a></strong></p>
-                              </div>
+                    <div class="col-md-6 col-sm-12">
+                         <div class="contact-image">
+                              <img src="images/contact-1-600x400.jpg" class="img-responsive" alt="">
                          </div>
                     </div>
                </div>
-               <?php } else { ?>
-               <div class="alert alert-danger">Car not found.</div>
-               <?php } ?>
           </div>
      </section>
      <!-- FOOTER -->
@@ -139,7 +130,7 @@ if (isset($_GET['id'])) {
                                    <li><a href="#" class="fa fa-twitter"></a></li>
                                    <li><a href="#" class="fa fa-instagram"></a></li>
                               </ul>
-                              <div class="copyright-text"> 
+                              <div class="copyright-text">
                                    <p>Copyright &copy; 2020 Sell Car</p>
                               </div>
                          </div>
@@ -157,8 +148,8 @@ if (isset($_GET['id'])) {
                                    <h2>Quick Links</h2>
                                    <ul>
                                         <li><a href="index.php">Home</a></li>
-                                        <li><a href="about-us.php">About Us</a></li>
-                                        <li><a href="terms.php">Terms & Conditions</a></li>
+                                        <li><a href="about-us.html">About Us</a></li>
+                                        <li><a href="terms.html">Terms & Conditions</a></li>
                                         <li><a href="contact.php">Contact Us</a></li>
                                    </ul>
                               </div>

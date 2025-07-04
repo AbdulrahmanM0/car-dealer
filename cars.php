@@ -34,14 +34,14 @@
                          <span class="icon icon-bar"></span>
                          <span class="icon icon-bar"></span>
                     </button>
-                    <a href="#" class="navbar-brand">Car Dealer Website</a>
+                    <a href="#" class="navbar-brand">SELL CAR</a>
                </div>
                <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav navbar-nav-first">
                          <li><a href="index.php">Home</a></li>
                          <li class="active"><a href="cars.php">Cars</a></li>
                          <li><a href="about-us.html">About Us</a></li>
-                         <li><a href="contact.html">Contact Us</a></li>
+                         <li><a href="contact.php">Contact Us</a></li>
                     </ul>
                </div>
           </div>
@@ -154,7 +154,7 @@
                                    <h2>Headquarter</h2>
                               </div>
                               <address>
-                                   <p>212 Barrington Court <br>New York, ABC 10001</p>
+                                   <p>212 Barrington Court <br>Suadi abc 10001</p>
                               </address>
                               <ul class="social-icon">
                                    <li><a href="#" class="fa fa-facebook-square" attr="facebook icon"></a></li>
@@ -162,8 +162,7 @@
                                    <li><a href="#" class="fa fa-instagram"></a></li>
                               </ul>
                               <div class="copyright-text">
-                                   <p>Copyright &copy; 2020 Company Name</p>
-                                   <p>Template by: <a href="https://www.phpjabbers.com/">PHPJabbers.com</a></p>
+                                   <p>Copyright &copy; 2020 Sell Car</p>
                               </div>
                          </div>
                     </div>
